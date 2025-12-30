@@ -1,5 +1,5 @@
 token:
-  private_key_path:
-  public_key_path:
-  token_expires_in_minutes:
-port:
+  private_key_path: ./pkg/token/keys/private_key.pem
+  public_key_path: ./pkg/token/keys/public_key.pem
+  token_expires_in_minutes: 60
+port: 8081

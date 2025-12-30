@@ -26,12 +26,12 @@ func main() {
 	logger := middlewares.NewLogger()
 	authMiddleware := middlewares.NewAuthMiddleware(tokenManager)
 
-	accessToken, err := tokenManager.GenerateAccessToken("user_id")
-	if err != nil {
-		panic(err)
-	}
+	// accessToken, err := tokenManager.GenerateAccessToken("user_id")
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	println(accessToken)
+	// println(accessToken)
 
 	app := fiber.New()
 	app.Use(rateLimiter, logger)

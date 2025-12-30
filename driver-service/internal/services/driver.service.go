@@ -1,0 +1,75 @@
+package services
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/AkifhanIlgaz/taxihub/driver-service/internal/models"
+	"github.com/AkifhanIlgaz/taxihub/driver-service/internal/repositories"
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
+)
+
+type DriverService struct {
+	repo repositories.DriverRepository
+}
+
+func NewDriverService(repo repositories.DriverRepository) *DriverService {
+	return &DriverService{
+		repo: repo,
+	}
+}
+
+func (s *DriverService) AddDriver(driverToAdd models.AddDriverRequest) (bson.ObjectID, error) {
+	driver := driverToAdd.ToDriver()
+	return s.repo.Insert(context.Background(), driver)
+}
+
+func (s *DriverService) UpdateDriver(id string, driverToUpdate models.UpdateDriverRequest) error {
+	driverId, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		return fmt.Errorf("update driver: %w", err)
+	}
+
+	updates, err := driverToUpdate.ToUpdateDoc()
+	if err != nil {
+		return fmt.Errorf("update driver: %w", err)
+	}
+
+	return s.repo.UpdateById(context.Background(), driverId, updates)
+}
+
+func (s *DriverService) GetDrivers(req models.ListDriversRequest) ([]models.ListDriversResponse, error) {
+	opts := options.Find()
+	var metadata *models.Metadata
+
+	if req.Page != 0 && req.PageSize != 0 {
+		skip := int64((req.Page - 1) * req.PageSize)
+		opts = options.Find().SetSkip(skip).SetLimit(int64(req.PageSize))
+		metadata = &models.Metadata{
+			Page:     req.Page,
+			PageSize: req.PageSize,
+		}
+	}
+
+	drivers, count, err := s.repo.FindDrivers(context.Background(), bson.M{}, opts)
+	if err != nil {
+		return nil, fmt.Errorf("get drivers: %w", err)
+	}
+
+	if metadata != nil && metadata.PageSize > 0 {
+		metadata.TotalCount = int(count)
+		metadata.TotalPages = int((count + int64(req.PageSize) - 1) / int64(req.PageSize))
+	}
+
+	return []models.ListDriversResponse{
+		{
+			Drivers: drivers,
+			Meta:    metadata,
+		},
+	}, nil
+}
+
+func (s *DriverService) GetNearbyDrivers(req models.ListNearbyDriversRequest) ([]models.Driver, error) {
+	panic(``)
+}

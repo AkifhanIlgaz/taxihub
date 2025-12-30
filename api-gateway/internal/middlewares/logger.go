@@ -12,7 +12,7 @@ func NewLogger() fiber.Handler {
 		Format:     "[${time}] ${status} - ${method} ${path} (${latency}) - IP: ${ip} - User-Agent: ${ua} - User ID: ${userId}\n",
 		TimeFormat: "2006-01-02 15:04:05",
 		TimeZone:   "Local",
-		Output:     os.Stdout, // veya bir dosyaya yazilabilir
+		Output:     os.Stdout, //  bir dosyaya veya elasticsearch e yazilabilir
 		CustomTags: map[string]logger.LogFunc{
 			"userId": func(output logger.Buffer, c *fiber.Ctx, data *logger.Data, extraParam string) (int, error) {
 				if userId := c.Locals("userId"); userId != nil {
