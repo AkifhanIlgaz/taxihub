@@ -11,3 +11,10 @@ type Metadata struct {
 	TotalCount int `json:"totalCount"`
 	TotalPages int `json:"totalPages"`
 }
+
+type NearbyDrivers struct {
+	FirstName  string  `json:"firstName" bson:"firstName"`
+	LastName   string  `json:"lastName" bson:"lastName"`
+	Plate      string  `json:"plate" bson:"plate"`
+	DistanceKm float64 `json:"distanceKm" bson:"distanceKm"`
+}

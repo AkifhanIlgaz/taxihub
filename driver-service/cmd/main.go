@@ -64,6 +64,36 @@ func main() {
 		})
 
 	})
+
+	driversRouter.Get("/nearby", func(c *fiber.Ctx) error {
+		var req models.ListNearbyDriversRequest
+		if err := c.QueryParser(&req); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"message": "Geçersiz JSON formatı",
+			})
+		}
+
+		if errors := validator.ValidateStruct(req); errors != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"message": "Doğrulama hatası",
+				"errors":  errors,
+			})
+		}
+
+		drivers, err := driverService.GetNearbyDrivers(req)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"message": "Internal Server Error",
+				"error":   err.Error(),
+			})
+		}
+		return c.Status(fiber.StatusFound).JSON(fiber.Map{
+			"message": "Sürücüler başarıyla listelendi",
+			"data":    drivers,
+		})
+
+	})
+
 	driversRouter.Post("/", func(c *fiber.Ctx) error {
 		var req models.AddDriverRequest
 		if err := c.BodyParser(&req); err != nil {

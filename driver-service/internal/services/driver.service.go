@@ -3,6 +3,8 @@ package services
 import (
 	"context"
 	"fmt"
+	"math"
+	"sort"
 
 	"github.com/AkifhanIlgaz/taxihub/driver-service/internal/models"
 	"github.com/AkifhanIlgaz/taxihub/driver-service/internal/repositories"
@@ -70,6 +72,52 @@ func (s *DriverService) GetDrivers(req models.ListDriversRequest) ([]models.List
 	}, nil
 }
 
-func (s *DriverService) GetNearbyDrivers(req models.ListNearbyDriversRequest) ([]models.Driver, error) {
-	panic(``)
+func (s *DriverService) GetNearbyDrivers(req models.ListNearbyDriversRequest) ([]models.NearbyDrivers, error) {
+	filter := bson.M{
+		"taxiType": req.TaxiType,
+	}
+
+	drivers, _, err := s.repo.FindDrivers(context.Background(), filter, nil)
+	if err != nil {
+		return nil, fmt.Errorf("get drivers: %w", err)
+	}
+
+	nearbyDrivers := []models.NearbyDrivers{}
+
+	for _, driver := range drivers {
+		distance := calcDistance(req.Latitude, req.Longitude, driver.Latitude, driver.Longitude)
+		if distance < 6 {
+			nearbyDrivers = append(nearbyDrivers, models.NearbyDrivers{
+				FirstName:  driver.FirstName,
+				LastName:   driver.LastName,
+				Plate:      driver.Plate,
+				DistanceKm: distance,
+			})
+		}
+	}
+
+	sort.Slice(nearbyDrivers, func(i, j int) bool {
+		return nearbyDrivers[i].DistanceKm < nearbyDrivers[j].DistanceKm
+	})
+
+	return nearbyDrivers, nil
+}
+
+func calcDistance(lat1, lon1, lat2, lon2 float64) float64 {
+	const earthRadius = 6371 // Earth's radius in kilometers => 3440,1 NM (Nautical Mile )
+
+	lat1Rad, lon1Rad := degreeToRadian(lat1), degreeToRadian(lon1)
+	lat2Rad, lon2Rad := degreeToRadian(lat2), degreeToRadian(lon2)
+
+	diffLat := lat2Rad - lat1Rad
+	diffLon := lon2Rad - lon1Rad
+
+	a := math.Sin(diffLat/2)*math.Sin(diffLat/2) + math.Cos(lat1Rad)*math.Cos(lat2Rad)*math.Sin(diffLon/2)*math.Sin(diffLon/2)
+	c := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
+
+	return earthRadius * c
+}
+
+func degreeToRadian(degree float64) float64 {
+	return degree * math.Pi / 180
 }
