@@ -1,0 +1,4 @@
+mongo:
+  connection_string: "mongodb://taxihub:taxihubpass@mongo:27017/taxihub?authSource=admin"
+  database: "taxihub"
+port: 8082

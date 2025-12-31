@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/AkifhanIlgaz/taxihub/driver-service/internal/config"
 	"github.com/AkifhanIlgaz/taxihub/driver-service/internal/models"
@@ -11,6 +12,7 @@ import (
 	"github.com/AkifhanIlgaz/taxihub/driver-service/pkg/database"
 	"github.com/AkifhanIlgaz/taxihub/driver-service/pkg/validator"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
 func main() {
@@ -33,7 +35,14 @@ func main() {
 
 	driverService := services.NewDriverService(driverRepo)
 
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		AppName:      "TaxiHub Driver Service",
+		ServerHeader: "Driver Service",
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	})
+
+	app.Use(recover.New())
 
 	driversRouter := app.Group("/drivers")
 	driversRouter.Get("/", func(c *fiber.Ctx) error {

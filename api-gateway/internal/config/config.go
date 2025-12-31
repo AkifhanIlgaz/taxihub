@@ -12,9 +12,14 @@ type TokenConfig struct {
 	TokenExpiresInMinutes int    `mapstructure:"token_expires_in_minutes"`
 }
 
+type DriverService struct {
+	Url string `mapstructure:"url"`
+}
+
 type ServiceConfig struct {
-	Token TokenConfig `mapstructure:"token"`
-	Port  int         `mapstructure:"port"`
+	Token         TokenConfig   `mapstructure:"token"`
+	Port          int           `mapstructure:"port"`
+	DriverService DriverService `mapstructure:"driver-service"`
 }
 
 func Load() (ServiceConfig, error) {

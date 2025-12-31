@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: taxihub-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: taxihub
+      MONGO_INITDB_ROOT_USERNAME: taxihub
+      MONGO_INITDB_ROOT_PASSWORD: taxihubpass # normalde hard-coded olarak verilmemesi lazim
+    volumes:
+      - mongo-data:/data/db
+
+  driver-service:
+    build: ./driver-service
+    depends_on:
+      - mongo
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8081:8081"
+    depends_on:
+      - driver-service
+
+volumes:
+  mongo-data:
