@@ -5,12 +5,11 @@ import (
 	"log"
 	"time"
 
+	"github.com/AkifhanIlgaz/taxihub/api-gateway/internal/clients"
 	"github.com/AkifhanIlgaz/taxihub/api-gateway/internal/config"
-	"github.com/AkifhanIlgaz/taxihub/api-gateway/internal/middlewares"
+	"github.com/AkifhanIlgaz/taxihub/api-gateway/internal/routes"
 	"github.com/AkifhanIlgaz/taxihub/api-gateway/pkg/token"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/proxy"
-	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
 func main() {
@@ -24,16 +23,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	rateLimiter := middlewares.NewRateLimiter(10, 10*time.Minute)
-	logger := middlewares.NewLogger()
-	authMiddleware := middlewares.NewAuthMiddleware(tokenManager)
-
-	// accessToken, err := tokenManager.GenerateAccessToken("user_id")
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// println(accessToken)
+	clientManager, err := clients.NewClientManager(config.DriverService.Url)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	app := fiber.New(fiber.Config{
 		AppName:      "TaxiHub API Gateway",
@@ -42,40 +35,10 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	})
 
-	app.Use(recover.New(), rateLimiter, logger)
-
-	app.Get("/token", func(c *fiber.Ctx) error {
-		accessToken, err := tokenManager.GenerateAccessToken("user_id")
-		if err != nil {
-			panic(err)
-		}
-		return c.SendString(accessToken)
-	})
-
-	app.Get("/health", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"status":  "healthy",
-			"service": "API Gateway",
-			"time":    time.Now().Format(time.RFC3339),
-		})
-	})
-
-	app.All("/drivers/*", authMiddleware.MustLoggedIn(), func(c *fiber.Ctx) error {
-		url := config.DriverService.Url + c.Path()
-
-		if len(c.Request().URI().QueryString()) > 0 {
-			url += "?" + string(c.Request().URI().QueryString())
-		}
-
-		return proxy.Do(c, url)
-	})
-
-	app.Get("/protected", authMiddleware.MustLoggedIn(), func(c *fiber.Ctx) error {
-		userId := c.Locals("userId").(string)
-
-		return c.SendString("Hello, " + userId)
-	})
+	routes.Setup(app, clientManager, tokenManager, config)
 
 	addr := fmt.Sprintf(":%v", config.Port)
-	app.Listen(addr)
+	if err := app.Listen(addr); err != nil {
+		log.Fatalf("❌ Failed to start server: %v", err)
+	}
 }
