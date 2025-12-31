@@ -22,7 +22,7 @@ type driverRepository struct {
 
 func NewDriverRepository(mongoDb *mongo.Database) DriverRepository {
 
-	// Eger index olusturmak gerekirse burada olusturabilir
+	// Eger index olusturmak gerekirse burada olusturabilir, Ornegin plaka
 
 	return &driverRepository{
 		coll: mongoDb.Collection(database.DriversCollection),

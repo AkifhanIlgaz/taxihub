@@ -38,6 +38,6 @@ COPY --from=builder /app/api-gateway/main .
 COPY --from=builder /app/api-gateway/internal/config ./internal/config
 COPY --from=builder /app/api-gateway/pkg/token/keys ./pkg/token/keys
 
-EXPOSE 8081
+EXPOSE 8080
 
 CMD ["./main"]

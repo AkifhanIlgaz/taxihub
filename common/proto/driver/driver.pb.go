@@ -27,16 +27,16 @@ const (
 type Driver struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	FirstName     string                 `protobuf:"bytes,2,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
-	LastName      string                 `protobuf:"bytes,3,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
+	FirstName     string                 `protobuf:"bytes,2,opt,name=first_name,json=firstName,proto3" json:"firstName,omitempty"`
+	LastName      string                 `protobuf:"bytes,3,opt,name=last_name,json=lastName,proto3" json:"lastName,omitempty"`
 	Plate         string                 `protobuf:"bytes,4,opt,name=plate,proto3" json:"plate,omitempty"`
-	TaxiType      string                 `protobuf:"bytes,5,opt,name=taxi_type,json=taxiType,proto3" json:"taxi_type,omitempty"`
-	CarBrand      string                 `protobuf:"bytes,6,opt,name=car_brand,json=carBrand,proto3" json:"car_brand,omitempty"`
-	CarModel      string                 `protobuf:"bytes,7,opt,name=car_model,json=carModel,proto3" json:"car_model,omitempty"`
+	TaxiType      string                 `protobuf:"bytes,5,opt,name=taxi_type,json=taxiType,proto3" json:"taxiType,omitempty"`
+	CarBrand      string                 `protobuf:"bytes,6,opt,name=car_brand,json=carBrand,proto3" json:"carBrand,omitempty"`
+	CarModel      string                 `protobuf:"bytes,7,opt,name=car_model,json=carModel,proto3" json:"carModel,omitempty"`
 	Latitude      float64                `protobuf:"fixed64,8,opt,name=latitude,proto3" json:"latitude,omitempty"`
 	Longitude     float64                `protobuf:"fixed64,9,opt,name=longitude,proto3" json:"longitude,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"createdAt,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=updated_at,json=updatedAt,proto3" json:"updatedAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -447,7 +447,7 @@ func (x *UpdateDriverResponse) GetMessage() string {
 type GetDriversRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"pageSize,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -496,30 +496,30 @@ func (x *GetDriversRequest) GetPageSize() int32 {
 	return 0
 }
 
-type Metadata struct {
+type PaginationMetadata struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	TotalCount    int64                  `protobuf:"varint,3,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`
-	TotalPages    int64                  `protobuf:"varint,4,opt,name=total_pages,json=totalPages,proto3" json:"total_pages,omitempty"`
+	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"pageSize,omitempty"`
+	TotalCount    int64                  `protobuf:"varint,3,opt,name=total_count,json=totalCount,proto3" json:"totalCount,omitempty"`
+	TotalPages    int64                  `protobuf:"varint,4,opt,name=total_pages,json=totalPages,proto3" json:"totalPages,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Metadata) Reset() {
-	*x = Metadata{}
+func (x *PaginationMetadata) Reset() {
+	*x = PaginationMetadata{}
 	mi := &file_driver_driver_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Metadata) String() string {
+func (x *PaginationMetadata) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Metadata) ProtoMessage() {}
+func (*PaginationMetadata) ProtoMessage() {}
 
-func (x *Metadata) ProtoReflect() protoreflect.Message {
+func (x *PaginationMetadata) ProtoReflect() protoreflect.Message {
 	mi := &file_driver_driver_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -531,33 +531,33 @@ func (x *Metadata) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Metadata.ProtoReflect.Descriptor instead.
-func (*Metadata) Descriptor() ([]byte, []int) {
+// Deprecated: Use PaginationMetadata.ProtoReflect.Descriptor instead.
+func (*PaginationMetadata) Descriptor() ([]byte, []int) {
 	return file_driver_driver_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *Metadata) GetPage() int32 {
+func (x *PaginationMetadata) GetPage() int32 {
 	if x != nil {
 		return x.Page
 	}
 	return 0
 }
 
-func (x *Metadata) GetPageSize() int32 {
+func (x *PaginationMetadata) GetPageSize() int32 {
 	if x != nil {
 		return x.PageSize
 	}
 	return 0
 }
 
-func (x *Metadata) GetTotalCount() int64 {
+func (x *PaginationMetadata) GetTotalCount() int64 {
 	if x != nil {
 		return x.TotalCount
 	}
 	return 0
 }
 
-func (x *Metadata) GetTotalPages() int64 {
+func (x *PaginationMetadata) GetTotalPages() int64 {
 	if x != nil {
 		return x.TotalPages
 	}
@@ -567,7 +567,7 @@ func (x *Metadata) GetTotalPages() int64 {
 type GetDriversResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Drivers       []*Driver              `protobuf:"bytes,1,rep,name=drivers,proto3" json:"drivers,omitempty"`
-	Meta          *Metadata              `protobuf:"bytes,2,opt,name=meta,proto3" json:"meta,omitempty"`
+	Meta          *PaginationMetadata    `protobuf:"bytes,2,opt,name=meta,proto3" json:"meta,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -609,7 +609,7 @@ func (x *GetDriversResponse) GetDrivers() []*Driver {
 	return nil
 }
 
-func (x *GetDriversResponse) GetMeta() *Metadata {
+func (x *GetDriversResponse) GetMeta() *PaginationMetadata {
 	if x != nil {
 		return x.Meta
 	}
@@ -678,10 +678,10 @@ func (x *GetNearbyDriversRequest) GetTaxiType() string {
 
 type NearbyDriver struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	FirstName     string                 `protobuf:"bytes,1,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
-	LastName      string                 `protobuf:"bytes,2,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
+	FirstName     string                 `protobuf:"bytes,1,opt,name=first_name,json=firstName,proto3" json:"firstName,omitempty"`
+	LastName      string                 `protobuf:"bytes,2,opt,name=last_name,json=lastName,proto3" json:"lastName,omitempty"`
 	Plate         string                 `protobuf:"bytes,3,opt,name=plate,proto3" json:"plate,omitempty"`
-	DistanceKm    float64                `protobuf:"fixed64,4,opt,name=distance_km,json=distanceKm,proto3" json:"distance_km,omitempty"`
+	DistanceKm    float64                `protobuf:"fixed64,4,opt,name=distance_km,json=distanceKm,proto3" json:"distanceKm,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -849,17 +849,17 @@ const file_driver_driver_proto_rawDesc = "" +
 	"\amessage\x18\x01 \x01(\tR\amessage\"D\n" +
 	"\x11GetDriversRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\"}\n" +
-	"\bMetadata\x12\x12\n" +
+	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\"\x87\x01\n" +
+	"\x12PaginationMetadata\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1b\n" +
 	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\x12\x1f\n" +
 	"\vtotal_count\x18\x03 \x01(\x03R\n" +
 	"totalCount\x12\x1f\n" +
 	"\vtotal_pages\x18\x04 \x01(\x03R\n" +
-	"totalPages\"d\n" +
+	"totalPages\"n\n" +
 	"\x12GetDriversResponse\x12(\n" +
-	"\adrivers\x18\x01 \x03(\v2\x0e.driver.DriverR\adrivers\x12$\n" +
-	"\x04meta\x18\x02 \x01(\v2\x10.driver.MetadataR\x04meta\"p\n" +
+	"\adrivers\x18\x01 \x03(\v2\x0e.driver.DriverR\adrivers\x12.\n" +
+	"\x04meta\x18\x02 \x01(\v2\x1a.driver.PaginationMetadataR\x04meta\"p\n" +
 	"\x17GetNearbyDriversRequest\x12\x1a\n" +
 	"\blatitude\x18\x01 \x01(\x01R\blatitude\x12\x1c\n" +
 	"\tlongitude\x18\x02 \x01(\x01R\tlongitude\x12\x1b\n" +
@@ -900,7 +900,7 @@ var file_driver_driver_proto_goTypes = []any{
 	(*UpdateDriverRequest)(nil),      // 3: driver.UpdateDriverRequest
 	(*UpdateDriverResponse)(nil),     // 4: driver.UpdateDriverResponse
 	(*GetDriversRequest)(nil),        // 5: driver.GetDriversRequest
-	(*Metadata)(nil),                 // 6: driver.Metadata
+	(*PaginationMetadata)(nil),       // 6: driver.PaginationMetadata
 	(*GetDriversResponse)(nil),       // 7: driver.GetDriversResponse
 	(*GetNearbyDriversRequest)(nil),  // 8: driver.GetNearbyDriversRequest
 	(*NearbyDriver)(nil),             // 9: driver.NearbyDriver
@@ -911,7 +911,7 @@ var file_driver_driver_proto_depIdxs = []int32{
 	11, // 0: driver.Driver.created_at:type_name -> google.protobuf.Timestamp
 	11, // 1: driver.Driver.updated_at:type_name -> google.protobuf.Timestamp
 	0,  // 2: driver.GetDriversResponse.drivers:type_name -> driver.Driver
-	6,  // 3: driver.GetDriversResponse.meta:type_name -> driver.Metadata
+	6,  // 3: driver.GetDriversResponse.meta:type_name -> driver.PaginationMetadata
 	9,  // 4: driver.GetNearbyDriversResponse.drivers:type_name -> driver.NearbyDriver
 	1,  // 5: driver.DriverService.AddDriver:input_type -> driver.AddDriverRequest
 	3,  // 6: driver.DriverService.UpdateDriver:input_type -> driver.UpdateDriverRequest

@@ -14,6 +14,8 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
+const MaxDistanceKm = 6.0
+
 type DriverService struct {
 	repo repositories.DriverRepository
 }
@@ -24,18 +26,18 @@ func NewDriverService(repo repositories.DriverRepository) *DriverService {
 	}
 }
 
-func (s *DriverService) AddDriver(driverToAdd *pb.AddDriverRequest) (bson.ObjectID, error) {
+func (s *DriverService) AddDriver(ctx context.Context, driverToAdd *pb.AddDriverRequest) (bson.ObjectID, error) {
 	driver := mappers.ProtoToDriver(driverToAdd)
 	return s.repo.Insert(context.Background(), driver)
 }
 
-func (s *DriverService) UpdateDriver(id string, driverToUpdate *pb.UpdateDriverRequest) error {
+func (s *DriverService) UpdateDriver(ctx context.Context, id string, driverToUpdate *pb.UpdateDriverRequest) error {
 	driverId, err := bson.ObjectIDFromHex(id)
 	if err != nil {
 		return fmt.Errorf("update driver: %w", err)
 	}
 
-	updates, err := mappers.ToUpdateDoc(driverToUpdate)
+	updates, err := mappers.ProtoToUpdateDoc(driverToUpdate)
 	if err != nil {
 		return fmt.Errorf("update driver: %w", err)
 	}
@@ -43,14 +45,14 @@ func (s *DriverService) UpdateDriver(id string, driverToUpdate *pb.UpdateDriverR
 	return s.repo.UpdateById(context.Background(), driverId, updates)
 }
 
-func (s *DriverService) GetDrivers(req *pb.GetDriversRequest) (*pb.GetDriversResponse, error) {
+func (s *DriverService) GetDrivers(ctx context.Context, req *pb.GetDriversRequest) ([]models.Driver, *models.PaginationMetadata, error) {
 	opts := options.Find()
-	var metadata *pb.Metadata
+	var metadata *models.PaginationMetadata
 
 	if req.Page != 0 && req.PageSize != 0 {
 		skip := int64((req.Page - 1) * req.PageSize)
 		opts = options.Find().SetSkip(skip).SetLimit(int64(req.PageSize))
-		metadata = &pb.Metadata{
+		metadata = &models.PaginationMetadata{
 			Page:     req.Page,
 			PageSize: req.PageSize,
 		}
@@ -58,21 +60,18 @@ func (s *DriverService) GetDrivers(req *pb.GetDriversRequest) (*pb.GetDriversRes
 
 	drivers, count, err := s.repo.FindDrivers(context.Background(), bson.M{}, opts)
 	if err != nil {
-		return nil, fmt.Errorf("get drivers: %w", err)
+		return nil, nil, fmt.Errorf("get drivers: %w", err)
 	}
 
 	if metadata != nil && metadata.PageSize > 0 {
 		metadata.TotalCount = count
-		metadata.TotalPages = (count + int64(req.PageSize) - 1) / int64(req.PageSize)
+		metadata.TotalPages = (count + int64(req.PageSize) - 1) / int64(req.PageSize) // ceil div
 	}
 
-	return &pb.GetDriversResponse{
-		Drivers: mappers.DriversToProto(drivers),
-		Meta:    metadata,
-	}, nil
+	return drivers, metadata, nil
 }
 
-func (s *DriverService) GetNearbyDrivers(req *pb.GetNearbyDriversRequest) (*pb.GetNearbyDriversResponse, error) {
+func (s *DriverService) GetNearbyDrivers(ctx context.Context, req *pb.GetNearbyDriversRequest) ([]models.NearbyDriver, error) {
 	filter := bson.M{
 		"taxiType": req.TaxiType,
 	}
@@ -86,7 +85,7 @@ func (s *DriverService) GetNearbyDrivers(req *pb.GetNearbyDriversRequest) (*pb.G
 
 	for _, driver := range drivers {
 		distance := calcDistance(req.Latitude, req.Longitude, driver.Latitude, driver.Longitude)
-		if distance < 6 {
+		if distance < MaxDistanceKm {
 			nearbyDrivers = append(nearbyDrivers, models.NearbyDriver{
 				FirstName:  driver.FirstName,
 				LastName:   driver.LastName,
@@ -100,9 +99,7 @@ func (s *DriverService) GetNearbyDrivers(req *pb.GetNearbyDriversRequest) (*pb.G
 		return nearbyDrivers[i].DistanceKm < nearbyDrivers[j].DistanceKm
 	})
 
-	return &pb.GetNearbyDriversResponse{
-		Drivers: mappers.NearbyDriversToProto(nearbyDrivers),
-	}, nil
+	return nearbyDrivers, nil
 }
 
 func calcDistance(lat1, lon1, lat2, lon2 float64) float64 {

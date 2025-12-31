@@ -1,7 +1,6 @@
 package mappers
 
 import (
-	"encoding/json"
 	"errors"
 	"time"
 
@@ -44,22 +43,38 @@ func DriverToProto(driver *models.Driver) *pb.Driver {
 
 func NearbyDriverToProto(driver models.NearbyDriver) *pb.NearbyDriver {
 	return &pb.NearbyDriver{
-		FirstName: driver.FirstName,
-		LastName:  driver.LastName,
-		Plate:     driver.Plate,
+		FirstName:  driver.FirstName,
+		LastName:   driver.LastName,
+		Plate:      driver.Plate,
+		DistanceKm: driver.DistanceKm,
 	}
 }
 
-func ToUpdateDoc(req *pb.UpdateDriverRequest) (bson.M, error) {
-
-	data, err := json.Marshal(req)
-	if err != nil {
-		return nil, err
-	}
-
+func ProtoToUpdateDoc(req *pb.UpdateDriverRequest) (bson.M, error) {
 	update := bson.M{}
-	if err := bson.Unmarshal(data, &update); err != nil {
-		return nil, err
+	if req.FirstName != nil {
+		update["firstName"] = req.GetFirstName()
+	}
+	if req.LastName != nil {
+		update["lastName"] = req.GetLastName()
+	}
+	if req.Plate != nil {
+		update["plate"] = req.GetPlate()
+	}
+	if req.TaxiType != nil {
+		update["taxiType"] = req.GetTaxiType()
+	}
+	if req.CarModel != nil {
+		update["carModel"] = req.GetCarModel()
+	}
+	if req.CarBrand != nil {
+		update["carBrand"] = req.GetCarBrand()
+	}
+	if req.Latitude != nil {
+		update["lat"] = req.GetLatitude()
+	}
+	if req.Longitude != nil {
+		update["lon"] = req.GetLongitude()
 	}
 
 	if len(update) == 0 {
@@ -85,4 +100,17 @@ func NearbyDriversToProto(drivers []models.NearbyDriver) []*pb.NearbyDriver {
 		result[i] = NearbyDriverToProto(driver)
 	}
 	return result
+}
+
+func PaginationMetadataToProto(metadata *models.PaginationMetadata) *pb.PaginationMetadata {
+	if metadata == nil {
+		return nil
+	}
+
+	return &pb.PaginationMetadata{
+		TotalCount: metadata.TotalCount,
+		TotalPages: metadata.TotalPages,
+		Page:       metadata.Page,
+		PageSize:   metadata.PageSize,
+	}
 }

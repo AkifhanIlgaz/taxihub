@@ -57,15 +57,15 @@ func GetNearbyDriversRequestToProto(req *GetNearbyDriversRequest) *pb.GetNearbyD
 }
 
 type UpdateDriverRequest struct {
-	FirstName *string   `json:"firstName,omitempty" bson:"firstName,omitempty"`
-	LastName  *string   `json:"lastName,omitempty" bson:"lastName,omitempty"`
-	Plate     *string   `json:"plate,omitempty" bson:"plate,omitempty"`
-	TaxiType  *string   `json:"taxiType,omitempty" bson:"taxiType,omitempty"`
-	CarModel  *string   `json:"carModel,omitempty" bson:"carModel,omitempty"`
-	CarBrand  *string   `json:"carBrand,omitempty" bson:"carBrand,omitempty"`
-	Latitude  *float64  `json:"lat,omitempty" bson:"latitude,omitempty"`
-	Longitude *float64  `json:"lon,omitempty" bson:"longitude,omitempty"`
-	UpdatedAt time.Time `json:"-" bson:"updatedAt"`
+	FirstName *string   `json:"firstName,omitempty" validate:"omitempty,min=2,max=100"`
+	LastName  *string   `json:"lastName,omitempty" validate:"omitempty,min=2,max=100"`
+	Plate     *string   `json:"plate,omitempty" validate:"omitempty,min=2,max=100"`
+	TaxiType  *string   `json:"taxiType,omitempty" validate:"omitempty,oneof=sari korsan uber tag"`
+	CarModel  *string   `json:"carModel,omitempty" validate:"omitempty,min=2,max=100"`
+	CarBrand  *string   `json:"carBrand,omitempty" validate:"omitempty,min=2,max=100"`
+	Latitude  *float64  `json:"lat,omitempty" validate:"omitempty,latitude"`
+	Longitude *float64  `json:"lon,omitempty" validate:"omitempty,longitude"`
+	UpdatedAt time.Time `json:"-"`
 }
 
 func UpdateDriverRequestToProto(req *UpdateDriverRequest) *pb.UpdateDriverRequest {

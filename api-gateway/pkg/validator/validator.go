@@ -1,6 +1,8 @@
 package validator
 
 import (
+	"fmt"
+
 	"github.com/go-playground/validator/v10"
 )
 
@@ -10,11 +12,13 @@ type ErrorResponse struct {
 	Value       string
 }
 
-// Global validator instance
+func (err ErrorResponse) Error() string {
+	return fmt.Sprintf("%s: %s", err.FailedField, err.Tag)
+}
+
 var validate = validator.New()
 
-// Struct doğrulama fonksiyonu
-func ValidateStruct(s interface{}) []*ErrorResponse {
+func ValidateStruct(s any) []*ErrorResponse {
 	var errors []*ErrorResponse
 	err := validate.Struct(s)
 	if err != nil {

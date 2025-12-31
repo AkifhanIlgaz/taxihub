@@ -65,7 +65,7 @@ message GetDriversRequest {
   int32 page_size = 2;
 }
 
-message Metadata {
+message PaginationMetadata {
   int32 page = 1;
   int32 page_size = 2;
   int64 total_count = 3;
@@ -74,7 +74,7 @@ message Metadata {
 
 message GetDriversResponse {
   repeated Driver drivers = 1;
-  Metadata meta = 2;
+  PaginationMetadata meta = 2;
 }
 
 message GetNearbyDriversRequest {
