@@ -9,21 +9,39 @@ services:
     environment:
       MONGO_INITDB_DATABASE: taxihub
       MONGO_INITDB_ROOT_USERNAME: taxihub
-      MONGO_INITDB_ROOT_PASSWORD: taxihubpass # normalde hard-coded olarak verilmemesi lazim
+      MONGO_INITDB_ROOT_PASSWORD: taxihubpass
     volumes:
       - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db. adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   driver-service:
-    build: ./driver-service
+    build:
+      context: .
+      dockerfile: driver-service/Dockerfile
+    container_name: taxihub-driver-service
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+    environment:
+      - MONGO_URI=mongodb://taxihub:taxihubpass@mongo:27017/taxihub
+    restart: unless-stopped
 
   api-gateway:
-    build: ./api-gateway
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: taxihub-api-gateway
     ports:
-      - "8081:8081"
+      - "8080:8080"
     depends_on:
       - driver-service
+    environment:
+      - DRIVER_SERVICE_URL=http://driver-service:50052
+    restart: unless-stopped
 
 volumes:
   mongo-data:

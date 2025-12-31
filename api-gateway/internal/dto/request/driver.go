@@ -1,10 +1,9 @@
-package models
+package dto
 
 import (
-	"errors"
 	"time"
 
-	"go.mongodb.org/mongo-driver/v2/bson"
+	pb "github.com/AkifhanIlgaz/taxihub/common/proto/driver"
 )
 
 type AddDriverRequest struct {
@@ -18,8 +17,8 @@ type AddDriverRequest struct {
 	Longitude float64 `json:"lon" validate:"required,longitude"`
 }
 
-func (req *AddDriverRequest) ToDriver() Driver {
-	return Driver{
+func AddDriverRequestToProto(req *AddDriverRequest) *pb.AddDriverRequest {
+	return &pb.AddDriverRequest{
 		FirstName: req.FirstName,
 		LastName:  req.LastName,
 		Plate:     req.Plate,
@@ -28,8 +27,6 @@ func (req *AddDriverRequest) ToDriver() Driver {
 		CarModel:  req.CarModel,
 		Latitude:  req.Latitude,
 		Longitude: req.Longitude,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
 	}
 }
 
@@ -38,10 +35,25 @@ type GetDriversRequest struct {
 	PageSize int `query:"pageSize" validate:"omitempty,gte=0,max=100"`
 }
 
+func GetDriversRequestToProto(req *GetDriversRequest) *pb.GetDriversRequest {
+	return &pb.GetDriversRequest{
+		Page:     int32(req.Page),
+		PageSize: int32(req.PageSize),
+	}
+}
+
 type GetNearbyDriversRequest struct {
 	Latitude  float64 `query:"lat" validate:"required,latitude"`
 	Longitude float64 `query:"lon" validate:"required,longitude"`
 	TaxiType  string  `query:"taxiType" validate:"required,oneof=sari korsan uber tag"`
+}
+
+func GetNearbyDriversRequestToProto(req *GetNearbyDriversRequest) *pb.GetNearbyDriversRequest {
+	return &pb.GetNearbyDriversRequest{
+		Latitude:  req.Latitude,
+		Longitude: req.Longitude,
+		TaxiType:  req.TaxiType,
+	}
 }
 
 type UpdateDriverRequest struct {
@@ -56,22 +68,15 @@ type UpdateDriverRequest struct {
 	UpdatedAt time.Time `json:"-" bson:"updatedAt"`
 }
 
-func (req *UpdateDriverRequest) ToUpdateDoc() (bson.M, error) {
-	req.UpdatedAt = time.Now()
-
-	data, err := bson.Marshal(req)
-	if err != nil {
-		return nil, err
+func UpdateDriverRequestToProto(req *UpdateDriverRequest) *pb.UpdateDriverRequest {
+	return &pb.UpdateDriverRequest{
+		FirstName: req.FirstName,
+		LastName:  req.LastName,
+		Plate:     req.Plate,
+		TaxiType:  req.TaxiType,
+		CarModel:  req.CarModel,
+		CarBrand:  req.CarBrand,
+		Latitude:  req.Latitude,
+		Longitude: req.Longitude,
 	}
-
-	update := bson.M{}
-	if err := bson.Unmarshal(data, &update); err != nil {
-		return nil, err
-	}
-
-	if len(update) == 0 {
-		return nil, errors.New("no fields to update")
-	}
-
-	return update, nil
 }

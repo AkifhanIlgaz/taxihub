@@ -6,6 +6,8 @@ import (
 	"math"
 	"sort"
 
+	pb "github.com/AkifhanIlgaz/taxihub/common/proto/driver"
+	"github.com/AkifhanIlgaz/taxihub/driver-service/internal/mappers"
 	"github.com/AkifhanIlgaz/taxihub/driver-service/internal/models"
 	"github.com/AkifhanIlgaz/taxihub/driver-service/internal/repositories"
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -22,18 +24,18 @@ func NewDriverService(repo repositories.DriverRepository) *DriverService {
 	}
 }
 
-func (s *DriverService) AddDriver(driverToAdd models.AddDriverRequest) (bson.ObjectID, error) {
-	driver := driverToAdd.ToDriver()
+func (s *DriverService) AddDriver(driverToAdd *pb.AddDriverRequest) (bson.ObjectID, error) {
+	driver := mappers.ProtoToDriver(driverToAdd)
 	return s.repo.Insert(context.Background(), driver)
 }
 
-func (s *DriverService) UpdateDriver(id string, driverToUpdate models.UpdateDriverRequest) error {
+func (s *DriverService) UpdateDriver(id string, driverToUpdate *pb.UpdateDriverRequest) error {
 	driverId, err := bson.ObjectIDFromHex(id)
 	if err != nil {
 		return fmt.Errorf("update driver: %w", err)
 	}
 
-	updates, err := driverToUpdate.ToUpdateDoc()
+	updates, err := mappers.ToUpdateDoc(driverToUpdate)
 	if err != nil {
 		return fmt.Errorf("update driver: %w", err)
 	}
@@ -41,14 +43,14 @@ func (s *DriverService) UpdateDriver(id string, driverToUpdate models.UpdateDriv
 	return s.repo.UpdateById(context.Background(), driverId, updates)
 }
 
-func (s *DriverService) GetDrivers(req models.ListDriversRequest) ([]models.ListDriversResponse, error) {
+func (s *DriverService) GetDrivers(req *pb.GetDriversRequest) (*pb.GetDriversResponse, error) {
 	opts := options.Find()
-	var metadata *models.Metadata
+	var metadata *pb.Metadata
 
 	if req.Page != 0 && req.PageSize != 0 {
 		skip := int64((req.Page - 1) * req.PageSize)
 		opts = options.Find().SetSkip(skip).SetLimit(int64(req.PageSize))
-		metadata = &models.Metadata{
+		metadata = &pb.Metadata{
 			Page:     req.Page,
 			PageSize: req.PageSize,
 		}
@@ -60,19 +62,17 @@ func (s *DriverService) GetDrivers(req models.ListDriversRequest) ([]models.List
 	}
 
 	if metadata != nil && metadata.PageSize > 0 {
-		metadata.TotalCount = int(count)
-		metadata.TotalPages = int((count + int64(req.PageSize) - 1) / int64(req.PageSize))
+		metadata.TotalCount = count
+		metadata.TotalPages = (count + int64(req.PageSize) - 1) / int64(req.PageSize)
 	}
 
-	return []models.ListDriversResponse{
-		{
-			Drivers: drivers,
-			Meta:    metadata,
-		},
+	return &pb.GetDriversResponse{
+		Drivers: mappers.DriversToProto(drivers),
+		Meta:    metadata,
 	}, nil
 }
 
-func (s *DriverService) GetNearbyDrivers(req models.ListNearbyDriversRequest) ([]models.NearbyDrivers, error) {
+func (s *DriverService) GetNearbyDrivers(req *pb.GetNearbyDriversRequest) (*pb.GetNearbyDriversResponse, error) {
 	filter := bson.M{
 		"taxiType": req.TaxiType,
 	}
@@ -82,12 +82,12 @@ func (s *DriverService) GetNearbyDrivers(req models.ListNearbyDriversRequest) ([
 		return nil, fmt.Errorf("get drivers: %w", err)
 	}
 
-	nearbyDrivers := []models.NearbyDrivers{}
+	nearbyDrivers := []models.NearbyDriver{}
 
 	for _, driver := range drivers {
 		distance := calcDistance(req.Latitude, req.Longitude, driver.Latitude, driver.Longitude)
 		if distance < 6 {
-			nearbyDrivers = append(nearbyDrivers, models.NearbyDrivers{
+			nearbyDrivers = append(nearbyDrivers, models.NearbyDriver{
 				FirstName:  driver.FirstName,
 				LastName:   driver.LastName,
 				Plate:      driver.Plate,
@@ -100,7 +100,9 @@ func (s *DriverService) GetNearbyDrivers(req models.ListNearbyDriversRequest) ([
 		return nearbyDrivers[i].DistanceKm < nearbyDrivers[j].DistanceKm
 	})
 
-	return nearbyDrivers, nil
+	return &pb.GetNearbyDriversResponse{
+		Drivers: mappers.NearbyDriversToProto(nearbyDrivers),
+	}, nil
 }
 
 func calcDistance(lat1, lon1, lat2, lon2 float64) float64 {

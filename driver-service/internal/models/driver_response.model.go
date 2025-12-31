@@ -12,7 +12,7 @@ type Metadata struct {
 	TotalPages int `json:"totalPages"`
 }
 
-type NearbyDrivers struct {
+type NearbyDriver struct {
 	FirstName  string  `json:"firstName" bson:"firstName"`
 	LastName   string  `json:"lastName" bson:"lastName"`
 	Plate      string  `json:"plate" bson:"plate"`

@@ -2,6 +2,6 @@ token:
   private_key_path: ./pkg/token/keys/private_key.pem
   public_key_path: ./pkg/token/keys/public_key.pem
   token_expires_in_minutes: 60
-port: 8081
+port: 8080
 driver-service:
-  url: http://driver-service:8082
+  url: driver-service:50052
