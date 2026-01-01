@@ -28,7 +28,7 @@ const docTemplate = `{
                 "tags": [
                     "driver"
                 ],
-                "summary": "Suruculeri listele",
+                "summary": "Driver'ları listele",
                 "parameters": [
                     {
                         "type": "integer",
@@ -91,7 +91,7 @@ const docTemplate = `{
                 "tags": [
                     "driver"
                 ],
-                "summary": "Surucu ekle",
+                "summary": "Driver ekler",
                 "parameters": [
                     {
                         "description": "Add driver",
@@ -132,7 +132,7 @@ const docTemplate = `{
                 "tags": [
                     "driver"
                 ],
-                "summary": "Yakindaki suruculeri listele",
+                "summary": "Verilen koordinatların 6km yakınındaki driverları listeler",
                 "parameters": [
                     {
                         "type": "number",
@@ -212,7 +212,7 @@ const docTemplate = `{
                 "tags": [
                     "driver"
                 ],
-                "summary": "Surucu guncelle",
+                "summary": "Driver günceller",
                 "parameters": [
                     {
                         "type": "string",
@@ -255,7 +255,7 @@ const docTemplate = `{
         },
         "/health": {
             "get": {
-                "description": "Returns API Gateway health status with timestamp",
+                "description": "API Gateway health status döner",
                 "produces": [
                     "application/json"
                 ],
@@ -275,14 +275,14 @@ const docTemplate = `{
         },
         "/token": {
             "get": {
-                "description": "Generates a mock access token for testing",
+                "description": "Protected routeları test etmek için JWT access token oluşturur",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "helper"
                 ],
-                "summary": "Create access token",
+                "summary": "Access token oluştur",
                 "responses": {
                     "200": {
                         "description": "OK",

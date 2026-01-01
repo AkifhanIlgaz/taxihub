@@ -200,7 +200,7 @@ paths:
             $ref: '#/definitions/response.APIResponse'
       security:
       - BearerAuth: []
-      summary: Suruculeri listele
+      summary: Driver'ları listele
       tags:
       - driver
     post:
@@ -226,7 +226,7 @@ paths:
             $ref: '#/definitions/response.APIResponse'
       security:
       - BearerAuth: []
-      summary: Surucu ekle
+      summary: Driver ekler
       tags:
       - driver
   /drivers/{id}:
@@ -262,7 +262,7 @@ paths:
             $ref: '#/definitions/response.APIResponse'
       security:
       - BearerAuth: []
-      summary: Surucu guncelle
+      summary: Driver günceller
       tags:
       - driver
   /drivers/nearby:
@@ -310,12 +310,12 @@ paths:
             $ref: '#/definitions/response.APIResponse'
       security:
       - BearerAuth: []
-      summary: Yakindaki suruculeri listele
+      summary: Verilen koordinatların 6km yakınındaki driverları listeler
       tags:
       - driver
   /health:
     get:
-      description: Returns API Gateway health status with timestamp
+      description: API Gateway health status döner
       produces:
       - application/json
       responses:
@@ -328,7 +328,7 @@ paths:
       - helper
   /token:
     get:
-      description: Generates a mock access token for testing
+      description: Protected routeları test etmek için JWT access token oluşturur
       produces:
       - application/json
       responses:
@@ -342,7 +342,7 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: Create access token
+      summary: Access token oluştur
       tags:
       - helper
 securityDefinitions:
