@@ -16,10 +16,16 @@ type DriverService struct {
 	Url string `mapstructure:"url"`
 }
 
+type RateLimitConfig struct {
+	MaxRequests   int `mapstructure:"max_requests"`
+	WindowMinutes int `mapstructure:"window_minutes"`
+}
+
 type ServiceConfig struct {
-	Token         TokenConfig   `mapstructure:"token"`
-	Port          int           `mapstructure:"port"`
-	DriverService DriverService `mapstructure:"driver-service"`
+	Token         TokenConfig     `mapstructure:"token"`
+	Port          int             `mapstructure:"port"`
+	DriverService DriverService   `mapstructure:"driver-service"`
+	RateLimit     RateLimitConfig `mapstructure:"rate-limit"`
 }
 
 func Load() (ServiceConfig, error) {

@@ -3,14 +3,15 @@ package middlewares
 import (
 	"time"
 
+	"github.com/AkifhanIlgaz/taxihub/api-gateway/internal/config"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 )
 
-func NewRateLimiter(maxRequests int, duration time.Duration) fiber.Handler {
-	config := limiter.Config{
-		Max:        maxRequests,
-		Expiration: duration,
+func NewRateLimiter(cfg config.RateLimitConfig) fiber.Handler {
+	return limiter.New(limiter.Config{
+		Max:        cfg.MaxRequests,
+		Expiration: time.Duration(cfg.WindowMinutes) * time.Minute,
 		KeyGenerator: func(c *fiber.Ctx) string {
 			userID := c.Locals("userId")
 			if userID != nil {
@@ -24,7 +25,5 @@ func NewRateLimiter(maxRequests int, duration time.Duration) fiber.Handler {
 				"error":   "Rate limit exceeded",
 			})
 		},
-	}
-
-	return limiter.New(config)
+	})
 }

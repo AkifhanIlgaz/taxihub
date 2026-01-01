@@ -3,5 +3,8 @@ token:
   public_key_path: ./pkg/token/keys/public_key.pem
   token_expires_in_minutes: 60
 port: 8080
+rate_limit:
+  max_requests: 20
+  window_minutes: 60
 driver-service:
   url: driver-service:50052

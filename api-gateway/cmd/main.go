@@ -41,7 +41,7 @@ func main() {
 	}
 
 	authMiddleware := middlewares.NewAuthMiddleware(tokenManager)
-	rateLimiter := middlewares.NewRateLimiter(10, 10*time.Minute)
+	rateLimiter := middlewares.NewRateLimiter(config.RateLimit)
 	logger := middlewares.NewLogger()
 
 	driverHandler := handlers.NewDriverHandler(clientManager.DriverClient)

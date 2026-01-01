@@ -274,7 +274,7 @@ const docTemplate = `{
             }
         },
         "/token": {
-            "post": {
+            "get": {
                 "description": "Generates a mock access token for testing",
                 "produces": [
                     "application/json"

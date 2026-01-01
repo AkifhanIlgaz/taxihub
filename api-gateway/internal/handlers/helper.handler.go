@@ -38,7 +38,7 @@ func (h *HelperHandler) Health(c *fiber.Ctx) error {
 // @Produce json
 // @Success 200 {object} dto.CreateTokenResponse
 // @Failure 500 {object} map[string]string
-// @Router /token [post]
+// @Router /token [get]
 func (h *HelperHandler) CreateToken(c *fiber.Ctx) error {
 	accessToken, err := h.tokenManager.GenerateAccessToken("mock_user_id")
 	if err != nil {
