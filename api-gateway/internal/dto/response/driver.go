@@ -2,9 +2,14 @@ package dto
 
 import (
 	"time"
-
-	pb "github.com/AkifhanIlgaz/taxihub/common/proto/driver"
 )
+
+type PaginationMetadataResponse struct {
+	Page       int32 `json:"page"`
+	PageSize   int32 `json:"pageSize"`
+	TotalCount int64 `json:"totalCount"`
+	TotalPages int64 `json:"totalPages"`
+}
 
 type DriverResponse struct {
 	Id        string    `json:"id"`
@@ -20,18 +25,28 @@ type DriverResponse struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
-func ProtoToDriverResponse(driver *pb.Driver) *DriverResponse {
-	return &DriverResponse{
-		Id:        driver.Id,
-		FirstName: driver.FirstName,
-		LastName:  driver.LastName,
-		Plate:     driver.Plate,
-		TaxiType:  driver.TaxiType,
-		CarBrand:  driver.CarBrand,
-		CarModel:  driver.CarModel,
-		Latitude:  driver.Latitude,
-		Longitude: driver.Longitude,
-		CreatedAt: driver.CreatedAt.AsTime(),
-		UpdatedAt: driver.UpdatedAt.AsTime(),
-	}
+type NearbyDriverResponse struct {
+	FirstName  string  `json:"firstName" bson:"firstName"`
+	LastName   string  `json:"lastName" bson:"lastName"`
+	Plate      string  `json:"plate" bson:"plate"`
+	DistanceKm float64 `json:"distanceKm" bson:"distanceKm"`
+}
+
+type GetDriversResponse struct {
+	Drivers            []*DriverResponse           `json:"drivers"`
+	PaginationMetadata *PaginationMetadataResponse `json:"paginationMetadata,omitempty"`
+}
+
+type GetNearbyDriversResponse struct {
+	Drivers []*NearbyDriverResponse `json:"drivers"`
+}
+
+type HealthResponse struct {
+	Status  string `json:"status"`
+	Service string `json:"service"`
+	Time    string `json:"time"`
+}
+
+type CreateTokenResponse struct {
+	Token string `json:"token"`
 }

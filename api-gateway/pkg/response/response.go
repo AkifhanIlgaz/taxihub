@@ -9,7 +9,6 @@ type APIResponse struct {
 	Message string `json:"message,omitempty"`
 	Data    any    `json:"data,omitempty"`
 	Error   string `json:"error,omitempty"`
-	Meta    any    `json:"meta,omitempty"`
 }
 
 func Success(c *fiber.Ctx, data any, message string) error {

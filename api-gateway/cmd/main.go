@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	_ "github.com/AkifhanIlgaz/taxihub/api-gateway/docs"
 	"github.com/AkifhanIlgaz/taxihub/api-gateway/internal/clients"
 	"github.com/AkifhanIlgaz/taxihub/api-gateway/internal/config"
 	"github.com/AkifhanIlgaz/taxihub/api-gateway/internal/handlers"
@@ -12,8 +13,17 @@ import (
 	"github.com/AkifhanIlgaz/taxihub/api-gateway/internal/routers"
 	"github.com/AkifhanIlgaz/taxihub/api-gateway/pkg/token"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/swagger"
 )
 
+// @title TaxiHub API Gateway
+// @version 1.0
+// @description TaxiHub API Gateway dokumantasyonu
+// @host localhost:8080
+// @BasePath /api
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 	config, err := config.Load()
 	if err != nil {
@@ -35,8 +45,10 @@ func main() {
 	logger := middlewares.NewLogger()
 
 	driverHandler := handlers.NewDriverHandler(clientManager.DriverClient)
+	helperHandler := handlers.NewHelperHandler(tokenManager)
 
 	driverRouter := routers.NewDriverRouter(driverHandler)
+	helperRouter := routers.NewHelperRouter(helperHandler)
 
 	app := fiber.New(fiber.Config{
 		AppName:      "TaxiHub API Gateway",
@@ -45,26 +57,14 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	})
 
-	api := app.Group("/api", authMiddleware.MustLoggedIn(), rateLimiter, logger)
+	app.Get("/swagger/*", swagger.HandlerDefault)
 
-	api.Get("/health", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"status":  "healthy",
-			"service": "API Gateway",
-			"time":    time.Now().Format(time.RFC3339),
-		})
-	})
+	api := app.Group("/api", rateLimiter, logger)
+	helperRouter.RegisterRoutes(api)
 
-	// JWT token test etmek icin
-	api.Get("/token", func(c *fiber.Ctx) error {
-		accessToken, err := tokenManager.GenerateAccessToken("user_123")
-		if err != nil {
-			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
-		}
-		return c.JSON(fiber.Map{"token": accessToken})
-	})
+	protectedApi := api.Group("", authMiddleware.MustLoggedIn())
 
-	driverRouter.RegisterRoutes(api)
+	driverRouter.RegisterRoutes(protectedApi)
 
 	app.Use(func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{

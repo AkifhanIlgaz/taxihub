@@ -17,7 +17,7 @@ type AddDriverRequest struct {
 	Longitude float64 `json:"lon" validate:"required,longitude"`
 }
 
-func AddDriverRequestToProto(req *AddDriverRequest) *pb.AddDriverRequest {
+func (req *AddDriverRequest) ToProto() *pb.AddDriverRequest {
 	return &pb.AddDriverRequest{
 		FirstName: req.FirstName,
 		LastName:  req.LastName,
@@ -35,7 +35,7 @@ type GetDriversRequest struct {
 	PageSize int `query:"pageSize" validate:"omitempty,gte=0,max=100"`
 }
 
-func GetDriversRequestToProto(req *GetDriversRequest) *pb.GetDriversRequest {
+func (req *GetDriversRequest) ToProto() *pb.GetDriversRequest {
 	return &pb.GetDriversRequest{
 		Page:     int32(req.Page),
 		PageSize: int32(req.PageSize),
@@ -48,7 +48,7 @@ type GetNearbyDriversRequest struct {
 	TaxiType  string  `query:"taxiType" validate:"required,oneof=sari korsan uber tag"`
 }
 
-func GetNearbyDriversRequestToProto(req *GetNearbyDriversRequest) *pb.GetNearbyDriversRequest {
+func (req *GetNearbyDriversRequest) ToProto() *pb.GetNearbyDriversRequest {
 	return &pb.GetNearbyDriversRequest{
 		Latitude:  req.Latitude,
 		Longitude: req.Longitude,
@@ -68,7 +68,7 @@ type UpdateDriverRequest struct {
 	UpdatedAt time.Time `json:"-"`
 }
 
-func UpdateDriverRequestToProto(req *UpdateDriverRequest) *pb.UpdateDriverRequest {
+func (req *UpdateDriverRequest) ToProto() *pb.UpdateDriverRequest {
 	return &pb.UpdateDriverRequest{
 		FirstName: req.FirstName,
 		LastName:  req.LastName,

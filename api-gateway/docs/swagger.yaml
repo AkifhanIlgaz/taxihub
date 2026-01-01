@@ -1,0 +1,353 @@
+basePath: /api
+definitions:
+  dto.AddDriverRequest:
+    properties:
+      carBrand:
+        type: string
+      carModel:
+        type: string
+      firstName:
+        maxLength: 50
+        minLength: 2
+        type: string
+      lastName:
+        maxLength: 50
+        minLength: 2
+        type: string
+      lat:
+        type: number
+      lon:
+        type: number
+      plate:
+        maxLength: 9
+        minLength: 6
+        type: string
+      taxiType:
+        enum:
+        - sari
+        - korsan
+        - uber
+        - tag
+        type: string
+    required:
+    - carBrand
+    - carModel
+    - firstName
+    - lastName
+    - lat
+    - lon
+    - plate
+    - taxiType
+    type: object
+  dto.CreateTokenResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  dto.DriverResponse:
+    properties:
+      carBrand:
+        type: string
+      carModel:
+        type: string
+      createdAt:
+        type: string
+      firstName:
+        type: string
+      id:
+        type: string
+      lastName:
+        type: string
+      lat:
+        type: number
+      lon:
+        type: number
+      plate:
+        type: string
+      taxiType:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  dto.GetDriversResponse:
+    properties:
+      drivers:
+        items:
+          $ref: '#/definitions/dto.DriverResponse'
+        type: array
+      paginationMetadata:
+        $ref: '#/definitions/dto.PaginationMetadataResponse'
+    type: object
+  dto.GetNearbyDriversResponse:
+    properties:
+      drivers:
+        items:
+          $ref: '#/definitions/dto.NearbyDriverResponse'
+        type: array
+    type: object
+  dto.HealthResponse:
+    properties:
+      service:
+        type: string
+      status:
+        type: string
+      time:
+        type: string
+    type: object
+  dto.NearbyDriverResponse:
+    properties:
+      distanceKm:
+        type: number
+      firstName:
+        type: string
+      lastName:
+        type: string
+      plate:
+        type: string
+    type: object
+  dto.PaginationMetadataResponse:
+    properties:
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      totalCount:
+        type: integer
+      totalPages:
+        type: integer
+    type: object
+  dto.UpdateDriverRequest:
+    properties:
+      carBrand:
+        maxLength: 100
+        minLength: 2
+        type: string
+      carModel:
+        maxLength: 100
+        minLength: 2
+        type: string
+      firstName:
+        maxLength: 100
+        minLength: 2
+        type: string
+      lastName:
+        maxLength: 100
+        minLength: 2
+        type: string
+      lat:
+        type: number
+      lon:
+        type: number
+      plate:
+        maxLength: 100
+        minLength: 2
+        type: string
+      taxiType:
+        enum:
+        - sari
+        - korsan
+        - uber
+        - tag
+        type: string
+    type: object
+  response.APIResponse:
+    properties:
+      data: {}
+      error:
+        type: string
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: TaxiHub API Gateway dokumantasyonu
+  title: TaxiHub API Gateway
+  version: "1.0"
+paths:
+  /drivers:
+    get:
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Page Size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.GetDriversResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Suruculeri listele
+      tags:
+      - driver
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Add driver
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddDriverRequest'
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Surucu ekle
+      tags:
+      - driver
+  /drivers/{id}:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Driver ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update driver
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateDriverRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Surucu guncelle
+      tags:
+      - driver
+  /drivers/nearby:
+    get:
+      parameters:
+      - description: Latitude
+        in: query
+        name: lat
+        required: true
+        type: number
+      - description: Longitude
+        in: query
+        name: lon
+        required: true
+        type: number
+      - description: Taxi Type
+        enum:
+        - sari
+        - korsan
+        - uber
+        - tag
+        in: query
+        name: taxiType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.GetNearbyDriversResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Yakindaki suruculeri listele
+      tags:
+      - driver
+  /health:
+    get:
+      description: Returns API Gateway health status with timestamp
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HealthResponse'
+      summary: Health check
+      tags:
+      - helper
+  /token:
+    post:
+      description: Generates a mock access token for testing
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CreateTokenResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create access token
+      tags:
+      - helper
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
