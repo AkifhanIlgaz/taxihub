@@ -22,7 +22,7 @@ func NewDriverHandler(client pb.DriverServiceClient) *DriverHandler {
 	return &DriverHandler{client: client}
 }
 
-// @Summary Suruculeri listele
+// @Summary Driver'ları listele
 // @Tags driver
 // @Produce json
 // @Security BearerAuth
@@ -59,7 +59,7 @@ func (h *DriverHandler) GetDrivers(c *fiber.Ctx) error {
 	return response.Success(c, res, "Sürücüler başarıyla listelendi")
 }
 
-// @Summary Yakindaki suruculeri listele
+// @Summary Verilen koordinatların 6km yakınındaki driverları listeler
 // @Tags driver
 // @Produce json
 // @Security BearerAuth
@@ -97,7 +97,7 @@ func (h *DriverHandler) GetNearbyDrivers(c *fiber.Ctx) error {
 	return response.Success(c, res, "Sürücüler başarıyla listelendi")
 }
 
-// @Summary Surucu ekle
+// @Summary Driver ekler
 // @Tags driver
 // @Accept json
 // @Produce json
@@ -129,10 +129,10 @@ func (h *DriverHandler) AddDriver(c *fiber.Ctx) error {
 		return response.Error(c, fiber.StatusInternalServerError, err)
 	}
 
-	return response.Success(c, protoResp, "Sürücü başarıyla eklendi")
+	return response.Success(c, protoResp, "Driver başarıyla eklendi")
 }
 
-// @Summary Surucu guncelle
+// @Summary Driver günceller
 // @Tags driver
 // @Accept json
 // @Produce json
@@ -172,5 +172,5 @@ func (h *DriverHandler) UpdateDriver(c *fiber.Ctx) error {
 		return response.Error(c, fiber.StatusInternalServerError, err)
 	}
 
-	return response.Success(c, protoResp, "Sürücü başarıyla güncellendi")
+	return response.Success(c, protoResp, "Driver başarıyla güncellendi")
 }

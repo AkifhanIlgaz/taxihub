@@ -20,7 +20,6 @@ type Manager struct {
 }
 
 func NewManager(config config.TokenConfig) (*Manager, error) {
-
 	privateKey, err := loadPrivateKey(config.PrivateKeyPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create token manager: %w", err)
@@ -121,19 +120,16 @@ func loadPublicKey(path string) (*rsa.PublicKey, error) {
 		return nil, fmt.Errorf("could not read public key file: %w", err)
 	}
 
-	// Decode PEM block
 	block, _ := pem.Decode(publicKeyBytes)
 	if block == nil || block.Type != "PUBLIC KEY" {
 		return nil, fmt.Errorf("failed to decode PEM block containing public key")
 	}
 
-	// Parse the public key
 	publicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse public key: %w", err)
 	}
 
-	// Assert that the key is an RSA public key
 	rsaPublicKey, ok := publicKey.(*rsa.PublicKey)
 	if !ok {
 		return nil, fmt.Errorf("key is not an RSA public key")

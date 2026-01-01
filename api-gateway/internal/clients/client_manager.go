@@ -1,7 +1,6 @@
 package clients
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -30,14 +29,7 @@ func NewClientManager(driverUrl string) (*ClientManager, error) {
 }
 
 func createGRPCConnection(address string) (*grpc.ClientConn, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	conn, err := grpc.DialContext(
-		ctx,
-		address,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(),
+	conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithDefaultCallOptions(
 			grpc.MaxCallRecvMsgSize(10*1024*1024),
 			grpc.MaxCallSendMsgSize(10*1024*1024),
@@ -46,8 +38,7 @@ func createGRPCConnection(address string) (*grpc.ClientConn, error) {
 			Time:                10 * time.Second,
 			Timeout:             3 * time.Second,
 			PermitWithoutStream: true,
-		}),
-	)
+		}))
 	if err != nil {
 		return nil, err
 	}

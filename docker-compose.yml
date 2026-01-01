@@ -26,8 +26,6 @@ services:
     depends_on:
       mongo:
         condition: service_healthy
-    environment:
-      - MONGO_URI=mongodb://taxihub:taxihubpass@mongo:27017/taxihub
     restart: unless-stopped
 
   api-gateway:
@@ -39,8 +37,6 @@ services:
       - "8080:8080"
     depends_on:
       - driver-service
-    environment:
-      - DRIVER_SERVICE_URL=http://driver-service:50052
     restart: unless-stopped
 
 volumes:

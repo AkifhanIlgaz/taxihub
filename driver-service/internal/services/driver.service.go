@@ -28,7 +28,13 @@ func NewDriverService(repo repositories.DriverRepository) *DriverService {
 
 func (s *DriverService) AddDriver(ctx context.Context, driverToAdd *pb.AddDriverRequest) (bson.ObjectID, error) {
 	driver := mappers.ProtoToDriver(driverToAdd)
-	return s.repo.Insert(context.Background(), driver)
+
+	insertedId, err := s.repo.Insert(context.Background(), driver)
+	if err != nil {
+		return bson.ObjectID{}, fmt.Errorf("add driver: %w", err)
+	}
+
+	return insertedId, nil
 }
 
 func (s *DriverService) UpdateDriver(ctx context.Context, id string, driverToUpdate *pb.UpdateDriverRequest) error {
@@ -42,7 +48,11 @@ func (s *DriverService) UpdateDriver(ctx context.Context, id string, driverToUpd
 		return fmt.Errorf("update driver: %w", err)
 	}
 
-	return s.repo.UpdateById(context.Background(), driverId, updates)
+	if err := s.repo.UpdateById(context.Background(), driverId, updates); err != nil {
+		return fmt.Errorf("update driver: %w", err)
+	}
+
+	return nil
 }
 
 func (s *DriverService) GetDrivers(ctx context.Context, req *pb.GetDriversRequest) ([]models.Driver, *models.PaginationMetadata, error) {

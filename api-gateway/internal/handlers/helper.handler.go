@@ -18,7 +18,7 @@ func NewHelperHandler(tokenManager *token.Manager) *HelperHandler {
 
 // Health godoc
 // @Summary Health check
-// @Description Returns API Gateway health status with timestamp
+// @Description API Gateway health status döner
 // @Tags helper
 // @Produce json
 // @Success 200 {object} dto.HealthResponse
@@ -32,8 +32,8 @@ func (h *HelperHandler) Health(c *fiber.Ctx) error {
 }
 
 // CreateToken godoc
-// @Summary Create access token
-// @Description Generates a mock access token for testing
+// @Summary Access token oluştur
+// @Description Protected routeları test etmek için JWT access token oluşturur
 // @Tags helper
 // @Produce json
 // @Success 200 {object} dto.CreateTokenResponse
