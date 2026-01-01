@@ -1,35 +1,38 @@
 # TaxiHub
 
-TaxiHub, API Gateway + Driver Service + MongoDB'den olusan basit bir mikroservis ornegidir.
-
-## Hizli baslangic (tek komutla calistirma)
-
-1) Token key'lerini uretin:
+1) Public ve private keylerinizi oluşturun:
 
 ```bash
 chmod +x ./create_keys.sh
 ./create_keys.sh
 ```
 
-2) Tum servisi Docker Compose ile kaldirin:
+Eğer keylerinizi manuel olarak oluşturmak isterseniz lütfen buradaki dosyalara kaydedin.
+```bash
+./api-gateway/pkg/token/keys/private_key.pem
+./api-gateway/pkg/token/keys/public_key.pem
+```
+
+2) Tüm servisleri Docker Compose ile ayağa kaldırın:
 
 ```bash
 docker compose up --build
 ```
 
-Hepsi bu kadar. Servisler ayaga kalktiktan sonra API Gateway su adreslerden kullanilabilir:
+3) JWT Token Oluşturma
 
-- Swagger UI: `http://localhost:8080/swagger/index.html`
-- Health: `http://localhost:8080/health`
-- Token: `http://localhost:8080/token`
-- API BasePath (auth gerekli endpoint'ler): `http://localhost:8080/api`
+Bu endpointi kullanarak protected route'ları test etmek için bir JWT token alabilirsiniz. (Sadece test içindir)
+```bash
+GET http://localhost:8080/api/token
+```
 
-## Gereksinimler
+4) API Kullanımı
 
-- Docker + Docker Compose
-- OpenSSL (token key'lerini uretmek icin)
+Swagger dökümantasyonuna bu URL'den ulaşabilirsiniz. (NOT: JWT Auth gerektiren endpointler için Swagger'da `Authorize` alanına `Bearer <token>` formatında girin.)
+```bash
+(http://localhost:8080/swagger/index.html)
+```
 
 ## Notlar
 
-- `api-gateway/internal/config/config.yaml` ve `driver-service/internal/config/config.yaml` Docker icinde kullanilan ayarlari icerir.
-- Driver endpoint'leri auth gerektirir. Swagger'da `Authorize` alanina `Bearer <token>` formatinda girin.
+- Config dosyaları hızlıca test etmek için repoya push edilmiştir. Production için .gitignore'a eklenip server tarafında config dosyaları oluşturulmalı veya secret management toolları kullanılmalıdır.
