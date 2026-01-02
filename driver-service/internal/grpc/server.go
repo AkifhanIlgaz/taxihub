@@ -2,10 +2,12 @@ package grpc
 
 import (
 	"context"
+	"errors"
 
 	pb "github.com/AkifhanIlgaz/taxihub/common/proto/driver"
 	"github.com/AkifhanIlgaz/taxihub/driver-service/internal/mappers"
 	"github.com/AkifhanIlgaz/taxihub/driver-service/internal/services"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -24,6 +26,9 @@ func NewDriverServer(service *services.DriverService) *DriverServer {
 func (s *DriverServer) AddDriver(ctx context.Context, req *pb.AddDriverRequest) (*pb.AddDriverResponse, error) {
 	id, err := s.service.AddDriver(ctx, req)
 	if err != nil {
+		if mongo.IsDuplicateKeyError(err) {
+			return nil, status.Error(codes.AlreadyExists, "driver with plate already exists")
+		}
 		return nil, status.Errorf(codes.Internal, "failed to add driver: %v", err)
 	}
 
@@ -35,6 +40,9 @@ func (s *DriverServer) AddDriver(ctx context.Context, req *pb.AddDriverRequest) 
 func (s *DriverServer) UpdateDriver(ctx context.Context, req *pb.UpdateDriverRequest) (*pb.UpdateDriverResponse, error) {
 	err := s.service.UpdateDriver(ctx, req.Id, req)
 	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, status.Error(codes.NotFound, "driver not found")
+		}
 		return nil, status.Errorf(codes.Internal, "failed to update driver: %v", err)
 	}
 

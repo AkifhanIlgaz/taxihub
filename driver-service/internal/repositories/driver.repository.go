@@ -2,6 +2,8 @@ package repositories
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/AkifhanIlgaz/taxihub/driver-service/internal/models"
 	"github.com/AkifhanIlgaz/taxihub/driver-service/pkg/database"
@@ -20,13 +22,23 @@ type driverRepository struct {
 	coll *mongo.Collection
 }
 
-func NewDriverRepository(mongoDb *mongo.Database) DriverRepository {
+func NewDriverRepository(mongoDb *mongo.Database) (DriverRepository, error) {
+	coll := mongoDb.Collection(database.DriversCollection)
 
-	// Eger index olusturmak gerekirse burada olusturabilir, Ornegin plaka
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	_, err := coll.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys:    bson.M{"plate": 1},
+		Options: options.Index().SetUnique(true),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("create drivers plate index: %w", err)
+	}
 
 	return &driverRepository{
-		coll: mongoDb.Collection(database.DriversCollection),
-	}
+		coll: coll,
+	}, nil
 }
 
 func (r *driverRepository) Insert(ctx context.Context, driver models.Driver) (bson.ObjectID, error) {
@@ -40,8 +52,15 @@ func (r *driverRepository) Insert(ctx context.Context, driver models.Driver) (bs
 func (r *driverRepository) UpdateById(ctx context.Context, id bson.ObjectID, updates bson.M) error {
 	filter := bson.M{"_id": id}
 	update := bson.M{"$set": updates}
-	_, err := r.coll.UpdateOne(ctx, filter, update)
-	return err
+	res, err := r.coll.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+
+	if res.MatchedCount == 0 {
+		return mongo.ErrNoDocuments
+	}
+	return nil
 }
 
 func (r *driverRepository) FindDrivers(ctx context.Context, filters bson.M, opts *options.FindOptionsBuilder) ([]models.Driver, int64, error) {

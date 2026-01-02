@@ -31,7 +31,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	driverRepo := repositories.NewDriverRepository(mongodb)
+	driverRepo, err := repositories.NewDriverRepository(mongodb)
+	if err != nil {
+		log.Fatal(err)
+	}
 	driverService := services.NewDriverService(driverRepo)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.Port))

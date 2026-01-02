@@ -100,7 +100,7 @@ func (s *DriverService) GetNearbyDrivers(ctx context.Context, req *pb.GetNearbyD
 				FirstName:  driver.FirstName,
 				LastName:   driver.LastName,
 				Plate:      driver.Plate,
-				DistanceKm: distance,
+				DistanceKm: math.Round(distance*100) / 100,
 			})
 		}
 	}

@@ -347,6 +347,7 @@ paths:
       - helper
 securityDefinitions:
   BearerAuth:
+    description: Authorization header must start with "Bearer ".
     in: header
     name: Authorization
     type: apiKey

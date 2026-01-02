@@ -24,6 +24,7 @@ import (
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
+// @description Authorization header must start with "Bearer ".
 func main() {
 	config, err := config.Load()
 	if err != nil {

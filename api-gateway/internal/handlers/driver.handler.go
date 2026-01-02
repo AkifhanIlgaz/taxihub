@@ -12,6 +12,8 @@ import (
 	"github.com/AkifhanIlgaz/taxihub/api-gateway/pkg/validator"
 	pb "github.com/AkifhanIlgaz/taxihub/common/proto/driver"
 	"github.com/gofiber/fiber/v2"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type DriverHandler struct {
@@ -126,6 +128,9 @@ func (h *DriverHandler) AddDriver(c *fiber.Ctx) error {
 	protoReq := req.ToProto()
 	protoResp, err := h.client.AddDriver(ctx, protoReq)
 	if err != nil {
+		if status.Code(err) == codes.AlreadyExists {
+			return response.Error(c, fiber.StatusConflict, errors.New("driver with plate already exists"))
+		}
 		return response.Error(c, fiber.StatusInternalServerError, err)
 	}
 
@@ -169,6 +174,9 @@ func (h *DriverHandler) UpdateDriver(c *fiber.Ctx) error {
 
 	protoResp, err := h.client.UpdateDriver(ctx, protoReq)
 	if err != nil {
+		if status.Code(err) == codes.NotFound {
+			return response.Error(c, fiber.StatusNotFound, errors.New("driver not found"))
+		}
 		return response.Error(c, fiber.StatusInternalServerError, err)
 	}
 
