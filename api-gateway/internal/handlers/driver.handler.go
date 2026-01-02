@@ -142,7 +142,7 @@ func (h *DriverHandler) AddDriver(c *fiber.Ctx) error {
 // @Success 200 {object} response.APIResponse
 // @Failure 400 {object} response.APIResponse
 // @Failure 500 {object} response.APIResponse
-// @Router /drivers/{id} [put]
+// @Router /drivers/{id} [patch]
 func (h *DriverHandler) UpdateDriver(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

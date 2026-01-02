@@ -230,7 +230,7 @@ paths:
       tags:
       - driver
   /drivers/{id}:
-    put:
+    patch:
       consumes:
       - application/json
       parameters:

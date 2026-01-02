@@ -197,7 +197,7 @@ const docTemplate = `{
             }
         },
         "/drivers/{id}": {
-            "put": {
+            "patch": {
                 "security": [
                     {
                         "BearerAuth": []

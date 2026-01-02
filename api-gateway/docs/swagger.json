@@ -191,7 +191,7 @@
             }
         },
         "/drivers/{id}": {
-            "put": {
+            "patch": {
                 "security": [
                     {
                         "BearerAuth": []
