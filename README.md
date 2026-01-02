@@ -36,7 +36,7 @@ GET http://localhost:8080/api/token
 
 Swagger dökümantasyonuna bu URL'den ulaşabilirsiniz. (NOT: JWT Auth gerektiren endpointler için Swagger'da `Authorize` alanına `Bearer <token>` formatında girin.)
 ```bash
-(http://localhost:8080/swagger/index.html)
+http://localhost:8080/swagger/index.html
 ```
 
 ## Notlar
