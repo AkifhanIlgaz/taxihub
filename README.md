@@ -1,5 +1,11 @@
 # TaxiHub
 
+1) Projeyi indirin
+```bash
+git clone https://github.com/AkifhanIlgaz/taxihub.git
+cd taxihub
+```
+
 1) Public ve private keylerinizi oluşturun:
 
 ```bash
